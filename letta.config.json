@@ -1,0 +1,53 @@
+{
+    "provider": {
+        "type": "anthropic",
+        "api_key": "${ANTHROPIC_API_KEY}",
+        "base_url": "https://api.anthropic.com/v1"
+    },
+    "llm": {
+        "model": "claude-3-5-sonnet-20241022",
+        "model_endpoint_type": "anthropic", 
+        "model_endpoint": "https://api.anthropic.com/v1/messages",
+        "context_window": 200000,
+        "api_key": "${ANTHROPIC_API_KEY}",
+        "put_inner_thoughts_in_kwargs": true
+    },
+    "embeddings": {
+        "embedding_endpoint_type": "hugging-face",
+        "embedding_endpoint": "http://weaviate:8080",
+        "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+        "embedding_dim": 384,
+        "embedding_chunk_size": 8000,
+        "batch_size": 10
+    },
+    "vector_store": {
+        "type": "weaviate",
+        "url": "http://weaviate:8080",
+        "api_key": "default-key",
+        "schema": {
+            "class": "Document",
+            "vectorizer": "text2vec-transformers",
+            "modules": ["text2vec-transformers"],
+            "properties": [
+                {
+                    "name": "content",
+                    "dataType": ["text"]
+                },
+                {
+                    "name": "category",
+                    "dataType": ["text"]
+                },
+                {
+                    "name": "source",
+                    "dataType": ["text"]
+                }
+            ]
+        }
+    },
+    "graph_store": {
+        "type": "neo4j",
+        "uri": "bolt://neo4j:7687",
+        "username": "neo4j",
+        "password": "lettagraph"
+    }
+}

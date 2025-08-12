@@ -1,0 +1,62 @@
+services:
+  # Transformer service for Weaviate embeddings
+  t2v-transformers:
+    image: semitechnologies/transformers-inference:sentence-transformers-all-MiniLM-L6-v2
+    environment:
+      ENABLE_CUDA: 0
+
+  weaviate:
+    image: semitechnologies/weaviate:1.23.7
+    container_name: weaviate
+    ports:
+      - "8080:8080"
+    depends_on:
+      - t2v-transformers
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'text2vec-transformers'
+      CLUSTER_HOSTNAME: 'node1'
+      ENABLE_MODULES: 'text2vec-transformers'
+      TRANSFORMERS_INFERENCE_API: 'http://t2v-transformers:8080'
+      AUTHENTICATION_APIKEY_ENABLED: 'true'
+      AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'default-key'
+      AUTHENTICATION_APIKEY_USERS: 'default-user'
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+  neo4j:
+    image: neo4j:5.11.0
+    container_name: neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/lettagraph
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=1G
+      - NEO4J_dbms_memory_heap_max__size=1G
+    volumes:
+      - neo4j_data:/data
+
+  letta:
+    image: letta/letta:latest
+    container_name: letta
+    ports:
+      - "8283:8283"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - LETTA_API_KEY=sk-let-MGFmM2VkNjktN2I3Ni00MTg4LWJiODEtMjY5NjhjMTFmZWJjOmQ0YzgyOWZkLTRlZTgtNDJjMS1iNDIzLTVkODI2MjdjZjVlYw==
+      - LETTA_DISABLE_ADE=true
+      - LETTA_PERSISTENCE_DIR=/data
+    volumes:
+      - letta_data:/data
+    depends_on:
+      - neo4j
+      - weaviate
+
+volumes:
+  neo4j_data:
+  weaviate_data:
+  letta_data:
