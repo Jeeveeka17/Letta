@@ -1,0 +1,65 @@
+# Lending Rules and Policies
+
+## Personal Loan Rules
+1. Minimum Credit Score: 680
+   - Scores below 680 are automatically rejected
+   - Scores 680-720 require additional review
+   - Scores above 720 are fast-tracked
+
+2. Income Requirements
+   - Minimum annual income: $30,000
+   - Debt-to-Income ratio must not exceed 40%
+   - Must provide last 3 months' salary slips
+
+3. Employment Status
+   - Minimum 2 years of continuous employment
+   - Current employer: minimum 6 months
+   - Self-employed: 3 years of business existence
+
+## Business Loan Rules
+1. Credit Requirements
+   - Business credit score minimum: 700
+   - Personal credit score minimum: 650
+   - Clean credit history for past 24 months
+
+2. Business Requirements
+   - Minimum 2 years in operation
+   - Annual revenue: $100,000+
+   - Profitable for last 12 months
+   - Valid business registration
+
+3. Collateral Requirements
+   - 80% loan-to-value ratio for secured loans
+   - Additional personal guarantee required
+   - Business assets as primary collateral
+
+## Mortgage Loan Rules
+1. Credit Requirements
+   - Minimum credit score: 720
+   - No bankruptcies in past 7 years
+   - No foreclosures in past 5 years
+
+2. Down Payment
+   - Minimum 20% for conventional loans
+   - 3.5% for FHA loans
+   - 0% for VA loans (eligible veterans only)
+
+3. Income and Employment
+   - Debt-to-Income ratio below 43%
+   - 2 years continuous employment
+   - Stable income source
+
+## General Requirements
+1. Documentation
+   - Valid government ID
+   - Proof of address
+   - Income verification
+   - Bank statements (6 months)
+
+2. Age Requirements
+   - Minimum: 21 years
+   - Maximum: 65 years at loan maturity
+
+3. Citizenship
+   - Citizens or permanent residents
+   - Foreign nationals with valid work permits

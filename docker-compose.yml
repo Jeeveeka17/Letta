@@ -1,9 +1,27 @@
+version: '3.8'
+
 services:
   # Transformer service for Weaviate embeddings
   t2v-transformers:
     image: semitechnologies/transformers-inference:sentence-transformers-all-MiniLM-L6-v2
     environment:
       ENABLE_CUDA: 0
+
+  # OpenAI-compatible embedding proxy
+  embedding-proxy:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.11-slim
+        WORKDIR /app
+        RUN pip install fastapi uvicorn httpx
+        COPY embedding-proxy.py /app/
+        EXPOSE 8081
+        CMD ["python", "embedding-proxy.py"]
+    ports:
+      - "8081:8081"
+    depends_on:
+      - t2v-transformers
 
   weaviate:
     image: semitechnologies/weaviate:1.23.7
@@ -25,6 +43,18 @@ services:
       AUTHENTICATION_APIKEY_USERS: 'default-user'
     volumes:
       - weaviate_data:/var/lib/weaviate
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=letta
+      - POSTGRES_PASSWORD=lettagraph
+      - POSTGRES_DB=letta
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   neo4j:
     image: neo4j:5.11.0
@@ -50,13 +80,54 @@ services:
       - LETTA_API_KEY=sk-let-MGFmM2VkNjktN2I3Ni00MTg4LWJiODEtMjY5NjhjMTFmZWJjOmQ0YzgyOWZkLTRlZTgtNDJjMS1iNDIzLTVkODI2MjdjZjVlYw==
       - LETTA_DISABLE_ADE=true
       - LETTA_PERSISTENCE_DIR=/data
+      - LETTA_CONFIG_PATH=/app/letta.config.json
+      - WEAVIATE_ENDPOINT=http://weaviate:8080
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=lettagraph
+      - LETTA_USE_INTERNAL_DB=true
+      - LETTA_MODEL_DEFAULT=claude-3-5-sonnet-20241022
+      - LETTA_EMBEDDING_MODEL_DEFAULT=sentence-transformers/all-MiniLM-L6-v2
+      - LETTA_MODEL_ENDPOINT_TYPE_DEFAULT=anthropic
+      - LETTA_EMBEDDING_ENDPOINT_TYPE_DEFAULT=openai
+      - LETTA_EMBEDDING_ENDPOINT_DEFAULT=http://embedding-proxy:8081
+      - LETTA_EMBEDDING_ENDPOINT=http://embedding-proxy:8081
+      - LETTA_EMBEDDING_ENDPOINT_TYPE=openai
+      - LETTA_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - LETTA_VECTOR_STORE_TYPE=weaviate
+      - LETTA_VECTOR_STORE_URL=http://weaviate:8080
+      - LETTA_VECTOR_STORE_API_KEY=default-key
+      - LETTA_GRAPH_STORE_TYPE=neo4j
+      - LETTA_GRAPH_STORE_URI=bolt://neo4j:7687
+      - LETTA_GRAPH_STORE_USERNAME=neo4j
+      - LETTA_GRAPH_STORE_PASSWORD=lettagraph
+      - LETTA_FORCE_EXTERNAL_VECTOR_STORE=true
+      - LETTA_FORCE_EXTERNAL_GRAPH_STORE=true
+      - LETTA_DISABLE_INTERNAL_VECTOR_STORE=true
+      - LETTA_DISABLE_INTERNAL_GRAPH_STORE=true
+      - LETTA_ARCHIVAL_STORAGE_TYPE=weaviate
+      - LETTA_RECALL_STORAGE_TYPE=weaviate
+      - LETTA_METADATA_STORAGE_TYPE=postgresql
+      - LETTA_ARCHIVAL_STORAGE_URI=http://weaviate:8080
+      - LETTA_RECALL_STORAGE_URI=http://weaviate:8080
+      - LETTA_METADATA_STORAGE_URI=postgresql://letta:lettagraph@postgres:5432/letta
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=letta
+      - POSTGRES_USER=letta
+      - POSTGRES_PASSWORD=lettagraph
+      - DATABASE_URL=postgresql://letta:lettagraph@postgres:5432/letta
     volumes:
       - letta_data:/data
+      - ./letta.config.json:/app/letta.config.json:ro
     depends_on:
+      - postgres
       - neo4j
       - weaviate
+      - embedding-proxy
 
 volumes:
   neo4j_data:
   weaviate_data:
   letta_data:
+  postgres_data:

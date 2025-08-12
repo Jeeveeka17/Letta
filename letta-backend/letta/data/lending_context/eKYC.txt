@@ -1,0 +1,97 @@
+# eKYC Verification Rules and Requirements
+
+## Identity Verification
+1. Primary Documents Required
+   - Aadhaar Card (mandatory)
+   - PAN Card (mandatory for loans)
+   - Valid Passport (optional)
+   - Voter ID (optional)
+
+2. Biometric Verification
+   - Fingerprint matching with Aadhaar
+   - Facial recognition check
+   - Live photo capture required
+   - Video KYC for high-value loans
+
+3. Document Validation
+   - OCR verification of documents
+   - Digital signature verification
+   - Document tampering check
+   - Expiry date validation
+
+## Address Verification
+1. Proof of Address Documents
+   - Utility bills (not older than 3 months)
+   - Bank statements (not older than 3 months)
+   - Rental agreement (if applicable)
+   - Property documents (if owned)
+
+2. Address Validation Process
+   - Physical verification for loans above ₹5 lakhs
+   - GPS coordinates capture
+   - Address standardization
+   - Pin code verification
+
+## Digital Verification Steps
+1. Mobile Number Verification
+   - OTP verification mandatory
+   - SIM card ownership check
+   - Active status verification
+   - Spam score check
+
+2. Email Verification
+   - Email domain validation
+   - OTP verification required
+   - Anti-fraud check
+   - Activity score assessment
+
+3. Bank Account Verification
+   - Penny drop verification
+   - Account ownership validation
+   - Bank statement analysis
+   - Transaction pattern check
+
+## Consent Requirements
+1. Data Collection Consent
+   - Explicit consent for data usage
+   - Purpose specification
+   - Third-party sharing disclosure
+   - Retention period declaration
+
+2. Biometric Data Consent
+   - Separate consent for biometric data
+   - Usage limitation declaration
+   - Security measures disclosure
+   - Right to revoke consent
+
+3. Credit Check Consent
+   - Authorization for credit bureau check
+   - Scope of credit check
+   - Impact on credit score disclosure
+   - Data sharing specifications
+
+## Security Protocols
+1. Data Encryption
+   - End-to-end encryption
+   - 256-bit AES encryption
+   - Secure data transmission
+   - Encrypted storage
+
+2. Access Control
+   - Role-based access control
+   - Multi-factor authentication
+   - Session management
+   - Audit trail maintenance
+
+## Compliance Requirements
+1. Regulatory Compliance
+   - RBI guidelines adherence
+   - UIDAI compliance for Aadhaar
+   - PMLA regulations
+   - Data protection laws
+
+2. Record Keeping
+   - 7 years minimum retention
+   - Secure archival system
+   - Audit trail maintenance
+   - Version control

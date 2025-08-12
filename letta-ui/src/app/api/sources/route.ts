@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Forward the request to Letta server
-    const response = await fetch(`${LETTA_BASE_URL}/v1/sources`, {
+    const response = await fetch(`${LETTA_BASE_URL}/v1/sources/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const response = await fetch(`${LETTA_BASE_URL}/v1/sources`, {
+    const response = await fetch(`${LETTA_BASE_URL}/v1/sources/`, {
       headers: {
         'Authorization': `Bearer ${LETTA_API_KEY}`,
       },

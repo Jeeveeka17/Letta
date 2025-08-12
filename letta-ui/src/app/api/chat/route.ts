@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       const responseTexts: string[] = [];
       
       data.messages.forEach((msg: any) => {
-        // Check for assistant_message type with content
+        // Check for assistant_message type with content (PRIORITY - this should come first)
         if (msg.message_type === 'assistant_message' && msg.content && typeof msg.content === 'string') {
           responseTexts.push(msg.content);
         }
@@ -89,6 +89,37 @@ export async function POST(request: NextRequest) {
           if (typeof returnValue === 'string') {
             responseTexts.push(returnValue);
           }
+        }
+        
+        // Check for tool return messages (like grep_files results)
+        if (msg.message_type === 'tool_return_message' && msg.tool_return) {
+          if (typeof msg.tool_return === 'string') {
+            // Check if it's an error message
+            if (msg.tool_return.includes('Connection refused') || msg.tool_return.includes('Errno')) {
+              responseTexts.push(`⚠️ **Search Error**: ${msg.tool_return}\n\n💡 **LLM Response**: I'll provide an answer based on my general knowledge since the document search encountered an issue.`);
+            } else {
+              // Format tool results nicely
+              const formattedResult = msg.tool_return
+                .replace(/Found \d+ matches in \d+ files for pattern: '[^']*'\n=+\n\n/g, '')
+                .replace(/=== [^:]+:(\d+) ===/g, '\n**Line $1:**')
+                .replace(/>\s*(\d+):\s*/g, '$1: ')
+                .trim();
+              responseTexts.push(`📄 **Found in your document:**\n\n${formattedResult}`);
+            }
+          }
+        }
+        
+        // Check for reasoning messages to provide context
+        if (msg.message_type === 'reasoning_message' && msg.reasoning) {
+          if (typeof msg.reasoning === 'string' && msg.reasoning.length > 10) {
+            responseTexts.push(`🤔 **Analysis:** ${msg.reasoning}`);
+          }
+        }
+        
+        // Check for assistant_message with comprehensive LLM responses (should be last to get priority)
+        if (msg.message_type === 'assistant_message' && msg.content && typeof msg.content === 'string' && msg.content.length > 100) {
+          // This is likely the main LLM response, give it higher priority
+          responseTexts.unshift(`💡 **Complete Answer:**\n\n${msg.content}`);
         }
       });
       

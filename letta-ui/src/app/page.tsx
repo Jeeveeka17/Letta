@@ -284,8 +284,8 @@ export default function Home() {
             description: `Uploaded file: ${file.name}`,
             embedding_config: {
               embedding_model: "sentence-transformers/all-MiniLM-L6-v2",
-              embedding_endpoint_type: "hugging-face",
-              embedding_endpoint: "http://localhost:8080",
+              embedding_endpoint_type: "openai",
+              embedding_endpoint: "http://embedding-proxy:8081",
               embedding_dim: 384,
               embedding_chunk_size: 8000
             }

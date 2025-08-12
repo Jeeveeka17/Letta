@@ -1,7 +1,6 @@
 {
     "provider": {
         "type": "anthropic",
-        "api_key": "${ANTHROPIC_API_KEY}",
         "base_url": "https://api.anthropic.com/v1"
     },
     "llm": {
@@ -13,8 +12,8 @@
         "put_inner_thoughts_in_kwargs": true
     },
     "embeddings": {
-        "embedding_endpoint_type": "hugging-face",
-        "embedding_endpoint": "http://weaviate:8080",
+        "embedding_endpoint_type": "openai",
+        "embedding_endpoint": "http://embedding-proxy:8081",
         "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
         "embedding_dim": 384,
         "embedding_chunk_size": 8000,
@@ -48,6 +47,14 @@
         "type": "neo4j",
         "uri": "bolt://neo4j:7687",
         "username": "neo4j",
+        "password": "lettagraph"
+    },
+    "database": {
+        "type": "postgresql",
+        "host": "postgres",
+        "port": 5432,
+        "database": "letta",
+        "username": "letta",
         "password": "lettagraph"
     }
 }

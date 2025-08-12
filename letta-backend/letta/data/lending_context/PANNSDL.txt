@@ -1,0 +1,120 @@
+# PAN Card Verification Rules and Standards
+
+## PAN Format Validation
+1. Structure Requirements
+   - Total length: 10 characters
+   - First 3 characters: Letters (A-Z)
+   - Fourth character: P (Person) or C (Company)
+   - Fifth character: Letter (A-Z)
+   - Next 4 characters: Numbers (0-9)
+   - Last character: Letter (A-Z)
+
+2. Character Validation
+   - No special characters allowed
+   - No lowercase letters
+   - No spaces allowed
+   - Only alphanumeric characters
+
+3. Category Codes
+   - P: Individual/Personal
+   - C: Company
+   - H: Hindu Undivided Family
+   - A: Association of Persons
+   - F: Firm/Partnership
+   - T: Trust
+
+## Verification Process
+1. NSDL Database Check
+   - Real-time verification
+   - Name matching algorithm
+   - Date of birth validation
+   - Status check (Active/Inactive)
+
+2. Document Authentication
+   - Image quality check
+   - Hologram verification
+   - QR code validation
+   - Digital signature verification
+
+3. Cross Validation
+   - Aadhaar linking status
+   - Income tax filing history
+   - GST registration (if applicable)
+   - Company registration (if applicable)
+
+## Name Matching Rules
+1. Name Components
+   - First name matching
+   - Middle name validation
+   - Last name verification
+   - Title handling (Mr., Mrs., Dr., etc.)
+
+2. Matching Algorithms
+   - Exact match check
+   - Phonetic matching
+   - Fuzzy logic matching
+   - Abbreviation handling
+
+3. Special Cases
+   - Name with initials
+   - Multiple surnames
+   - Married name variations
+   - Professional titles
+
+## Status Verification
+1. Active Status
+   - Valid and linked to Aadhaar
+   - Regular tax filing history
+   - No reported duplicates
+   - No enforcement actions
+
+2. Inactive Status
+   - Surrender of PAN
+   - Duplicate PAN detected
+   - Death of holder
+   - Legal restrictions
+
+3. Temporary Status
+   - Under verification
+   - Pending updates
+   - Recent changes
+   - Compliance review
+
+## Error Handling
+1. Common Errors
+   - Invalid format
+   - Expired PAN
+   - Mismatch with other IDs
+   - Technical failures
+
+2. Resolution Steps
+   - Automatic retry
+   - Manual verification
+   - Alternate document request
+   - Escalation process
+
+## Compliance Requirements
+1. Data Protection
+   - Encryption in transit
+   - Secure storage
+   - Access logging
+   - Retention policies
+
+2. Regulatory Guidelines
+   - Income Tax regulations
+   - PMLA compliance
+   - SEBI guidelines
+   - RBI directives
+
+## Integration Standards
+1. API Requirements
+   - REST API endpoints
+   - XML/JSON formats
+   - Response codes
+   - Rate limiting
+
+2. Security Protocols
+   - SSL/TLS encryption
+   - API authentication
+   - IP whitelisting
+   - Request signing
