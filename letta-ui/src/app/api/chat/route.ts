@@ -6,29 +6,48 @@ const LETTA_BASE_URL = 'http://localhost:8283';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { agent_id, messages } = body;
+    const { agent_id, messages, message, agentId, isProcessingTrigger } = body;
     
-    if (!agent_id) {
+    // Handle both old format (agent_id) and new format (agentId)
+    const finalAgentId = agent_id || agentId;
+    
+    if (!finalAgentId) {
       return NextResponse.json(
-        { error: 'agent_id is required' },
+        { error: 'agent_id or agentId is required' },
         { status: 400 }
       );
     }
 
     // Convert messages to Letta format
-    const userMessage = messages[messages.length - 1];
-    const lettaRequest = {
-      messages: [
-        {
-          role: userMessage.role,
-          content: userMessage.content,
-          name: "user"
-        }
-      ]
-    };
+    let lettaRequest;
+    
+    if (message) {
+      // New format (single message, possibly a processing trigger)
+      lettaRequest = {
+        messages: [
+          {
+            role: "user",
+            content: message,
+            name: "user"
+          }
+        ]
+      };
+    } else {
+      // Old format (messages array)
+      const userMessage = messages[messages.length - 1];
+      lettaRequest = {
+        messages: [
+          {
+            role: userMessage.role,
+            content: userMessage.content,
+            name: "user"
+          }
+        ]
+      };
+    }
     
     // Forward the request to Letta server
-    const response = await fetch(`${LETTA_BASE_URL}/v1/agents/${agent_id}/messages`, {
+    const response = await fetch(`${LETTA_BASE_URL}/v1/agents/${finalAgentId}/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,11 +76,7 @@ export async function POST(request: NextRequest) {
       const responseTexts: string[] = [];
       
       data.messages.forEach((msg: any) => {
-        // Check for assistant_message type with content (PRIORITY - this should come first)
-        if (msg.message_type === 'assistant_message' && msg.content && typeof msg.content === 'string') {
-          responseTexts.push(msg.content);
-        }
-        
+        // Skip basic assistant_message processing to avoid duplicates - we handle this at the end
         // Check for direct assistant content (fallback)
         if (msg.role === 'assistant' && msg.content && typeof msg.content === 'string') {
           responseTexts.push(msg.content);
@@ -94,32 +109,39 @@ export async function POST(request: NextRequest) {
         // Check for tool return messages (like grep_files results)
         if (msg.message_type === 'tool_return_message' && msg.tool_return) {
           if (typeof msg.tool_return === 'string') {
-            // Check if it's an error message
-            if (msg.tool_return.includes('Connection refused') || msg.tool_return.includes('Errno')) {
-              responseTexts.push(`⚠️ **Search Error**: ${msg.tool_return}\n\n💡 **LLM Response**: I'll provide an answer based on my general knowledge since the document search encountered an issue.`);
-            } else {
-              // Format tool results nicely
-              const formattedResult = msg.tool_return
-                .replace(/Found \d+ matches in \d+ files for pattern: '[^']*'\n=+\n\n/g, '')
-                .replace(/=== [^:]+:(\d+) ===/g, '\n**Line $1:**')
-                .replace(/>\s*(\d+):\s*/g, '$1: ')
-                .trim();
-              responseTexts.push(`📄 **Found in your document:**\n\n${formattedResult}`);
+            // Check if it's an error message - skip displaying errors, let LLM handle fallback
+            if (!msg.tool_return.includes('Connection refused') && !msg.tool_return.includes('Errno') && !msg.tool_return.includes('Error')) {
+              // Skip showing raw document chunks - let the LLM synthesize the information instead
+              // The LLM will use this context to provide a proper contextual answer
+              // Raw document display removed to avoid showing fragmented text
             }
           }
         }
         
-        // Check for reasoning messages to provide context
+        // Check for reasoning messages to provide context (should appear FIRST)
         if (msg.message_type === 'reasoning_message' && msg.reasoning) {
           if (typeof msg.reasoning === 'string' && msg.reasoning.length > 10) {
-            responseTexts.push(`🤔 **Analysis:** ${msg.reasoning}`);
+            // Only add reasoning if it doesn't contain "Analysis:" already
+            if (!msg.reasoning.includes('🤔') && !msg.reasoning.includes('Analysis:')) {
+              responseTexts.unshift(`🤔 **Analysis:** ${msg.reasoning}`);
+            }
           }
         }
         
-        // Check for assistant_message with comprehensive LLM responses (should be last to get priority)
+        // Check for assistant_message with comprehensive LLM responses (avoid duplicates)
         if (msg.message_type === 'assistant_message' && msg.content && typeof msg.content === 'string' && msg.content.length > 100) {
-          // This is likely the main LLM response, give it higher priority
-          responseTexts.unshift(`💡 **Complete Answer:**\n\n${msg.content}`);
+          // Skip if content already contains analysis formatting to avoid duplicates
+          if (!msg.content.includes('🤔 **Analysis:**') && !msg.content.includes('💡 **Complete Answer:**')) {
+            const formattedContent = `💡 **Complete Answer:**\n\n${msg.content}`;
+            if (!responseTexts.some(text => text.includes(msg.content))) {
+              responseTexts.push(formattedContent);
+            }
+          } else {
+            // If content already has formatting, use it as-is
+            if (!responseTexts.some(text => text.includes(msg.content))) {
+              responseTexts.push(msg.content);
+            }
+          }
         }
       });
       
@@ -132,6 +154,16 @@ export async function POST(request: NextRequest) {
       console.log('Extracted responses:', validResponses);
     }
     
+    // Handle processing triggers silently (don't return response to user)
+    if (isProcessingTrigger) {
+      console.log('🔄 Processing trigger completed - document indexed for search');
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Document processing initiated',
+        processed: true 
+      });
+    }
+
     const lettaResponse = {
       choices: [
         {

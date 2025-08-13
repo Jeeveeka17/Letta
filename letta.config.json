@@ -17,7 +17,8 @@
         "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
         "embedding_dim": 384,
         "embedding_chunk_size": 8000,
-        "batch_size": 10
+        "batch_size": 10,
+        "default_embedding_dim": 384
     },
     "vector_store": {
         "type": "weaviate",
@@ -55,6 +56,13 @@
         "port": 5432,
         "database": "letta",
         "username": "letta",
-        "password": "lettagraph"
+        "password": "lettagraph",
+        "disable_vector_storage": true
+    },
+    "storage_config": {
+        "metadata_store": "postgresql",
+        "vector_store": "weaviate", 
+        "graph_store": "neo4j",
+        "force_external_stores": true
     }
 }

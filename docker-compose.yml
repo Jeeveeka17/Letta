@@ -95,7 +95,10 @@ services:
       - LETTA_EMBEDDING_ENDPOINT_TYPE=openai
       - LETTA_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - LETTA_EMBEDDING_DIM=384
+      - LETTA_DEFAULT_EMBEDDING_DIM=384
       - LETTA_VECTOR_STORE_TYPE=weaviate
+      - LETTA_PASSAGE_STORE_TYPE=weaviate
+      - LETTA_PASSAGE_STORE_URI=http://weaviate:8080
       - LETTA_VECTOR_STORE_URL=http://weaviate:8080
       - LETTA_VECTOR_STORE_API_KEY=default-key
       - LETTA_GRAPH_STORE_TYPE=neo4j
@@ -112,6 +115,14 @@ services:
       - LETTA_ARCHIVAL_STORAGE_URI=http://weaviate:8080
       - LETTA_RECALL_STORAGE_URI=http://weaviate:8080
       - LETTA_METADATA_STORAGE_URI=postgresql://letta:lettagraph@postgres:5432/letta
+      - LETTA_STORAGE_TYPE=hybrid
+      - LETTA_HYBRID_METADATA_STORE=postgresql
+      - LETTA_HYBRID_VECTOR_STORE=weaviate  
+      - LETTA_HYBRID_GRAPH_STORE=neo4j
+      - LETTA_DISABLE_POSTGRES_VECTOR_STORE=true
+      - LETTA_OVERRIDE_STORAGE_TYPE=external
+      - LETTA_VECTOR_STORE_BACKEND=weaviate
+      - LETTA_GRAPH_STORE_BACKEND=neo4j
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=letta

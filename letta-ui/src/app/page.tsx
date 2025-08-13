@@ -129,17 +129,25 @@ export default function Home() {
       if (response.ok) {
         // Refresh sources list after deletion
         await loadSources();
+        console.log('✅ Document deleted successfully');
       } else if (response.status === 404) {
         // Document already deleted, just refresh the list
         await loadSources();
+        console.log('✅ Document already deleted');
       } else {
-        const errorData = await response.json();
+        // Try to get error details, but handle empty responses
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { error: `HTTP ${response.status}` };
+        }
         console.error('Failed to delete source:', errorData);
-        setError('Failed to delete document');
+        setError(`Failed to delete document: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to delete source:', error);
-      setError('Failed to delete document');
+      setError(`Failed to delete document: ${error instanceof Error ? error.message : 'Network error'}`);
     }
   };
 
@@ -344,6 +352,29 @@ export default function Home() {
 
         // Refresh sources list
         await loadSources();
+
+        // 🚀 IMMEDIATE PROCESSING: Trigger document processing right after upload
+        // This eliminates the "cold start" issue by processing documents immediately
+        if (currentAgent) {
+          console.log(`🔄 Triggering immediate processing for document: ${uniqueName}`);
+          try {
+            // Send a hidden processing message to trigger semantic search setup
+            await fetch('/api/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                message: `Process and index the newly uploaded document "${file.name}" for semantic search.`,
+                agentId: currentAgent.id,
+                isProcessingTrigger: true // Flag to indicate this is for processing
+              })
+            });
+            console.log(`✅ Document processing triggered for: ${uniqueName}`);
+          } catch (processingError) {
+            console.warn('⚠️ Processing trigger failed (non-critical):', processingError);
+          }
+        }
 
       } catch (err) {
         console.error('Upload error:', err);
